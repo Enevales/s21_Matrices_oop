@@ -49,6 +49,21 @@ class S21Matrix {
         S21Matrix CalcComplements();
         double Determinant();
         S21Matrix InverseMatrix();
+        
+        // OPERATOR OVERLOADING
+        
+        S21Matrix operator + (const S21Matrix &other);
+        S21Matrix operator - (const S21Matrix &other);
+        S21Matrix operator * (const S21Matrix &other);
+        S21Matrix operator * (double num);
+        bool operator == (S21Matrix &other);
+        void operator = (S21Matrix &&other);
+        void operator += (S21Matrix &other);
+        void operator -= (S21Matrix &other);
+        void operator *= (S21Matrix &other);
+        void operator *= (double num);
+
+        double& operator()(int rows, int cols);
 };
 
 

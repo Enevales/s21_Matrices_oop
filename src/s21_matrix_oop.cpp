@@ -180,9 +180,20 @@ void  S21Matrix::MulNumber(const double num) {
  * to num. of rows of second matrix.
  *         0 - function runs without any errors.
 */
-// void S21Matrix::MulMatrix(const S21Matrix& other){
-//     // ..
-// }
+void S21Matrix::MulMatrix(const S21Matrix& other){
+    if (cols_ != other.rows_) {
+        throw std::out_of_range("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
+    }
+    S21Matrix res(rows_, other.cols_);
+    for (int i = 0; i < res.rows_; i++) {
+        for (int j = 0; j < res.cols_; j++) {
+            res.matrix_[i][j] = 0;
+            for (int k = 0; k < other.rows_; k++) {
+                res.matrix_[i][j] += matrix_[i][k] * other.matrix_[k][j];
+            }
+        }
+    }
+}
 
 /**
  * @brief switches matrix rows with its columns with
@@ -301,4 +312,51 @@ S21Matrix S21Matrix::InverseMatrix() {
     S21Matrix temp_1 = this->Transpose();
     res.MulNumber(1 / det);
     return res;
+}
+
+S21Matrix  S21Matrix::operator + (const S21Matrix &other){
+    S21Matrix res(*this);
+    res.SumMatrix(other);
+    return res;
+};
+S21Matrix  S21Matrix::operator - (const S21Matrix &other){
+    S21Matrix res(*this);
+    res.SubMatrix(other);
+    return res;
+}
+S21Matrix  S21Matrix::operator * (const S21Matrix &other){
+    S21Matrix res(*this); 
+    res.MulMatrix(other);
+    return res;
+}
+S21Matrix  S21Matrix::operator * (double num){
+    S21Matrix res(*this);
+    res.MulNumber(num);
+    return res;
+}
+bool  S21Matrix::operator == (S21Matrix &other){
+    return EqMatrix(other); 
+}
+
+void S21Matrix::operator = (S21Matrix &&other){
+    std::swap(*this, other);
+}
+void  S21Matrix::operator += (S21Matrix &other){
+    SumMatrix(other);
+}
+void  S21Matrix::operator -= (S21Matrix &other){
+    SubMatrix(other);
+}
+void  S21Matrix::operator *= (S21Matrix &other){
+    MulMatrix(other);
+}
+void  S21Matrix::operator *= (double num){
+    MulNumber(num);
+}
+
+double& S21Matrix::operator()(int rows, int cols) {
+    if (rows >= rows_ || cols >= cols_) {
+        throw std::logic_error("\nIndex out of range\n");
+    }
+    return matrix_[rows][cols];
 }
