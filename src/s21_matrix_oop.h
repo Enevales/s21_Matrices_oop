@@ -19,10 +19,7 @@ class S21Matrix {
         S21Matrix(int rows, int cols);
         S21Matrix(const S21Matrix &other);
         S21Matrix(S21Matrix&& other);
-        ~S21Matrix()
-        {
-            // free_matrix();
-        }
+        ~S21Matrix();
 
         // SUPPORTING FUNCTIONS
 
@@ -35,9 +32,12 @@ class S21Matrix {
         void SetRows(int rows);
         void SetColumns(int cols);
         void CreateMatrix(int rows, int cols);
-        void RemoveMatrix();
+        void DeleteMatrix();
         S21Matrix SubMatrix(int row, int column);
         S21Matrix SubMatrix_min(int column);
+        void SetElement(int row, int col, double value);
+        void FillMatrix(double num);
+
         // MATRIX OPERATIONS
 
         bool EqMatrix(const S21Matrix& other);
@@ -50,20 +50,20 @@ class S21Matrix {
         double Determinant();
         S21Matrix InverseMatrix();
         
-        // OPERATOR OVERLOADING
+        // OVERLOADED OPERATORS
         
         S21Matrix operator + (const S21Matrix &other);
         S21Matrix operator - (const S21Matrix &other);
         S21Matrix operator * (const S21Matrix &other);
         S21Matrix operator * (double num);
         bool operator == (S21Matrix &other);
-        void operator = (S21Matrix &&other);
+        S21Matrix& operator = (S21Matrix &&other);
         void operator += (S21Matrix &other);
         void operator -= (S21Matrix &other);
         void operator *= (S21Matrix &other);
         void operator *= (double num);
 
-        double& operator()(int rows, int cols);
+        double operator()(int rows, int cols);
 };
 
 

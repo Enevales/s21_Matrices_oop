@@ -1,9 +1,10 @@
 #include "s21_matrix_oop.h"
 
+// SUPPORTING FUNCTIONS
+
  // Default constructor
-S21Matrix::S21Matrix() {
-    rows_ = 3;
-    cols_ = 3;
+S21Matrix::S21Matrix() : rows_(3), cols_(3) {
+    CreateMatrix(rows_, cols_);
 }
  // Parametrized constructor with number of rows and columns
 S21Matrix::S21Matrix(int rows, int cols) {
@@ -12,42 +13,31 @@ S21Matrix::S21Matrix(int rows, int cols) {
     }
     rows_ = rows;
     cols_ = cols;
+    CreateMatrix(rows_, cols_);
     
 }
 
  // Copy constructor
-S21Matrix::S21Matrix(const S21Matrix &other){
-    rows_ = other.rows_;
-    cols_ = other.cols_;
-    // ...
-    // CopyArray(other.A, other.count); 
+S21Matrix::S21Matrix(const S21Matrix &other) : rows_(other.rows_), cols_(other.cols_) {
+    CreateMatrix(other.rows_, other.cols_);
+    for (int i = 0; i < rows_; i++) {
+        for (int j = 0; j < cols_; j++) {
+            matrix_[i][j] = other.matrix_[i][j];
+        }
+    }
 }
 
  // Move constructor
-S21Matrix::S21Matrix(S21Matrix&& other){
-    rows_ = other.rows_;
-    cols_ = other.cols_;
-    // ...
-    // CopyArray(other.A, other.count);
-    other.rows_ = 0;
-    other.cols_ = 0;
+S21Matrix::S21Matrix(S21Matrix&& other) : rows_(other.rows_), cols_(other.cols_), matrix_(other.matrix_) {
+  other.rows_ = 0;
+  other.cols_ = 0;
+  other.matrix_ = nullptr;
 
 }
 
  // Destructor
+ S21Matrix::~S21Matrix() { DeleteMatrix(); }
 
-void S21Matrix::SetRows(int rows){
-    if (rows < 1){
-        throw std::out_of_range("Wrong number of rows!");
-    } 
-    rows_ = rows;
-}
-void S21Matrix::SetColumns(int cols){
-    if (cols < 1){
-        throw std::out_of_range("Wrong number of columns!");
-    } 
-    cols_ = cols;
-}
 
 void S21Matrix::CreateMatrix(int rows, int cols){
     matrix_ = new double*[rows];
@@ -56,7 +46,7 @@ void S21Matrix::CreateMatrix(int rows, int cols){
     }
 }
 
-void S21Matrix::RemoveMatrix(){
+void S21Matrix::DeleteMatrix(){
     if (matrix_) {
         for (int i = 0; i < rows_; i++) {
             delete[] matrix_[i];
@@ -65,6 +55,28 @@ void S21Matrix::RemoveMatrix(){
         matrix_ = nullptr;
     }
 }
+
+void S21Matrix::SetElement(int row, int col, double value){
+    matrix_[row][col] = value;
+}
+
+/**
+ * @brief filling matrix with gradually
+ * incremented numbers, so that every
+ * element is greater than one before.
+ *
+ * @param num starting value
+*/
+void S21Matrix::FillMatrix(double num){
+    for (int i = 0; i < rows_; i++) {
+        for (int j = 0; j < cols_; j++) {
+        matrix_[i][j] = num;
+        num++;
+        }
+    }
+}
+
+// MATRIX OPERATIONS
 
 /**
  * @brief creates n-1 order mattrix in
@@ -103,7 +115,7 @@ S21Matrix S21Matrix::SubMatrix(int row, int column) {
 */
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) {
-  bool is_equal = false;
+  bool is_equal = true;
   if ((rows_ == other.rows_) && (cols_ == other.cols_)) {
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
@@ -126,11 +138,11 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) {
 */
 void S21Matrix::SumMatrix(const S21Matrix& other){
     if ((rows_ == other.rows_) || (cols_ == other.cols_)){
-        throw std::out_of_range("The sizes of two matrixes are not equal!");
+        throw std::logic_error("The sizes of two matrixes are not equal!");
     }
     for (int i = 0; i < other.rows_; i++) {
         for (int j = 0; j < other.cols_; j++) {
-            other.matrix_[i][j] = matrix_[i][j] + other.matrix_[i][j];
+            matrix_[i][j] = matrix_[i][j] + other.matrix_[i][j];
         }
     }
 }
@@ -145,11 +157,11 @@ void S21Matrix::SumMatrix(const S21Matrix& other){
 */
 void S21Matrix::SubMatrix(const S21Matrix& other) {
     if ((rows_ == other.rows_) || (cols_ == other.cols_)){
-        throw std::out_of_range("The sizes of two matrixes are not equal!");
+        throw std::logic_error("The sizes of two matrixes are not equal!");
     }
     for (int i = 0; i < other.rows_; i++) {
         for (int j = 0; j < other.cols_; j++) {
-            other.matrix_[i][j] = matrix_[i][j] - other.matrix_[i][j];
+            matrix_[i][j] = matrix_[i][j] - other.matrix_[i][j];
         }
     }
 }
@@ -182,7 +194,7 @@ void  S21Matrix::MulNumber(const double num) {
 */
 void S21Matrix::MulMatrix(const S21Matrix& other){
     if (cols_ != other.rows_) {
-        throw std::out_of_range("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
+        throw std::length_error("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
     }
     S21Matrix res(rows_, other.cols_);
     for (int i = 0; i < res.rows_; i++) {
@@ -242,7 +254,7 @@ S21Matrix S21Matrix::SubMatrix_min(int column) {
 */
 double S21Matrix::Determinant() {
     if(!this->is_square())
-    throw std::out_of_range("The matrix should be square!");
+    throw std::length_error("The matrix should be square!");
     
     double det = 0;
     double det_temp = 0;
@@ -275,7 +287,7 @@ double S21Matrix::Determinant() {
 
 S21Matrix S21Matrix::CalcComplements(){
     if(!this->is_square())
-    throw std::out_of_range("The matrix should be square!");
+    throw std::length_error("The matrix should be square!");
     S21Matrix res(*this);
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
@@ -303,7 +315,7 @@ S21Matrix S21Matrix::CalcComplements(){
 
 S21Matrix S21Matrix::InverseMatrix() {
     if(!this->is_square())
-    throw std::out_of_range("The matrix should be square!");
+    throw std::length_error("The matrix should be square!");
     double det = this->Determinant();
     if (det == 0)
     throw std::out_of_range("The determinant should be bigger than zero!");
@@ -313,6 +325,8 @@ S21Matrix S21Matrix::InverseMatrix() {
     res.MulNumber(1 / det);
     return res;
 }
+
+// OVERLOADED OPERATORS
 
 S21Matrix  S21Matrix::operator + (const S21Matrix &other){
     S21Matrix res(*this);
@@ -338,8 +352,20 @@ bool  S21Matrix::operator == (S21Matrix &other){
     return EqMatrix(other); 
 }
 
-void S21Matrix::operator = (S21Matrix &&other){
-    std::swap(*this, other);
+/*Заметьте, что деструктор при присвоении не вызывается. Это означает, что в реализации copy assignment
+ следует освобождать старые ресурсы перед присвоением новых значений.*/
+S21Matrix &S21Matrix::operator = (S21Matrix &&other){
+    if (this != &other) {
+        std::swap(rows_, other.rows_);
+        std::swap(cols_, other.cols_);
+        for (int i = 0; i < rows_; i++) {
+            for (int j = 0; j < cols_; j++) {
+                matrix_[i][j] = other.matrix_[i][j];
+            }
+        }
+    }
+
+    return *this;
 }
 void  S21Matrix::operator += (S21Matrix &other){
     SumMatrix(other);
@@ -354,7 +380,7 @@ void  S21Matrix::operator *= (double num){
     MulNumber(num);
 }
 
-double& S21Matrix::operator()(int rows, int cols) {
+double S21Matrix::operator()(int rows, int cols) {
     if (rows >= rows_ || cols >= cols_) {
         throw std::logic_error("\nIndex out of range\n");
     }
