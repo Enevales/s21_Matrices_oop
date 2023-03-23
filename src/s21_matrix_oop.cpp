@@ -56,10 +56,6 @@ void S21Matrix::DeleteMatrix(){
     }
 }
 
-void S21Matrix::SetElement(int row, int col, double value){
-    matrix_[row][col] = value;
-}
-
 /**
  * @brief filling matrix with gradually
  * incremented numbers, so that every
@@ -75,6 +71,18 @@ void S21Matrix::FillMatrix(double num){
         }
     }
 }
+
+void S21Matrix::CopyMatrix(const S21Matrix& other) {
+    rows_ = other.rows_;
+    cols_ = other.cols_;
+    CreateMatrix(rows_, cols_);
+    for (int i = 0; i < rows_; i++) {
+        for (int j = 0; j < cols_; j++) {
+            matrix_[i][j] = other.matrix_[i][j];
+        }
+    }
+}
+
 
 // MATRIX OPERATIONS
 
@@ -137,7 +145,7 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) {
  *         0 - function runs without any errors.
 */
 void S21Matrix::SumMatrix(const S21Matrix& other){
-    if ((rows_ == other.rows_) || (cols_ == other.cols_)){
+    if ((rows_ != other.rows_) || (cols_ != other.cols_)){
         throw std::logic_error("The sizes of two matrixes are not equal!");
     }
     for (int i = 0; i < other.rows_; i++) {
@@ -156,7 +164,7 @@ void S21Matrix::SumMatrix(const S21Matrix& other){
  *         0 - function runs without any errors.
 */
 void S21Matrix::SubMatrix(const S21Matrix& other) {
-    if ((rows_ == other.rows_) || (cols_ == other.cols_)){
+    if ((rows_ != other.rows_) || (cols_ != other.cols_)){
         throw std::logic_error("The sizes of two matrixes are not equal!");
     }
     for (int i = 0; i < other.rows_; i++) {
@@ -193,18 +201,19 @@ void  S21Matrix::MulNumber(const double num) {
  *         0 - function runs without any errors.
 */
 void S21Matrix::MulMatrix(const S21Matrix& other){
-    if (cols_ != other.rows_) {
+    if (cols_ != other.rows_ || rows_ != other.cols_) {
         throw std::length_error("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
     }
     S21Matrix res(rows_, other.cols_);
     for (int i = 0; i < res.rows_; i++) {
         for (int j = 0; j < res.cols_; j++) {
-            res.matrix_[i][j] = 0;
             for (int k = 0; k < other.rows_; k++) {
                 res.matrix_[i][j] += matrix_[i][k] * other.matrix_[k][j];
             }
         }
     }
+    CopyMatrix(res);
+    res.DeleteMatrix();
 }
 
 /**
@@ -216,13 +225,13 @@ void S21Matrix::MulMatrix(const S21Matrix& other){
 */
 
 S21Matrix S21Matrix::Transpose(){
-    S21Matrix res(*this);
+    S21Matrix res(cols_, rows_);
     for (int i = 0; i < res.rows_; i++) {
       for (int j = 0; j < res.cols_; j++) {
         res.matrix_[i][j] = matrix_[j][i];
       }
     }
-  return res;
+   return res;
 }
 
 S21Matrix S21Matrix::SubMatrix_min(int column) {
@@ -285,20 +294,42 @@ double S21Matrix::Determinant() {
  *         0 - function runs without any errors.
 */
 
-S21Matrix S21Matrix::CalcComplements(){
-    if(!this->is_square())
-    throw std::length_error("The matrix should be square!");
-    S21Matrix res(*this);
-    for (int i = 0; i < rows_; i++) {
-      for (int j = 0; j < cols_; j++) {
-        S21Matrix temp = SubMatrix(i, j);
-        if (temp.Determinant()) break;
-        if ((i + j + 2) % 2 != 0) res.matrix_[i][j] *= -1;
-      }
-    }
-    return res;
-}
+// S21Matrix S21Matrix::CalcComplements(){
+//     if(!this->is_square())
+//     throw std::length_error("The matrix should be square!");
+//     S21Matrix res(*this);
+//     S21Matrix temp(rows_-1, cols_-1);
+//     for (int i = 0; i < rows_; i++) {
+//       for (int j = 0; j < cols_; j++) {
+//         temp.(i, j);
+//         if (temp.Determinant()) break;
+//         if ((i + j + 2) % 2 != 0) res.matrix_[i][j] *= -1;
+//       }
 
+//     }
+//     return res;
+// }
+
+// int s21_calc_complements(matrix_t *A, matrix_t *result) {
+//   if (!valid_matrix(A)) return INCORRECT_MATRIX;
+//   if (A->columns != A->rows) {
+//     return CALCULATION_ERROR;
+//   }
+//   int error = s21_create_matrix(A->rows, A->columns, result);
+//   if (!error) {
+//     matrix_t temp = {0};
+//     s21_create_matrix(A->rows - 1, A->columns - 1, &temp);
+//     for (int i = 0; i < A->rows; i++) {
+//       for (int j = 0; j < A->columns; j++) {
+//         submatrix(i, j, A, &temp);
+//         if (s21_determinant(&temp, &result->matrix[i][j])) break;
+//         if ((i + j + 2) % 2 != 0) result->matrix[i][j] *= -1;
+//       }
+//     }
+//     s21_remove_matrix(&temp);
+//   }
+//   return error;
+// }
 
 /**
  * @brief finds inverse of a square matrix
@@ -354,18 +385,20 @@ bool  S21Matrix::operator == (S21Matrix &other){
 
 /*Заметьте, что деструктор при присвоении не вызывается. Это означает, что в реализации copy assignment
  следует освобождать старые ресурсы перед присвоением новых значений.*/
-S21Matrix &S21Matrix::operator = (S21Matrix &&other){
-    if (this != &other) {
-        std::swap(rows_, other.rows_);
-        std::swap(cols_, other.cols_);
-        for (int i = 0; i < rows_; i++) {
-            for (int j = 0; j < cols_; j++) {
-                matrix_[i][j] = other.matrix_[i][j];
-            }
-        }
-    }
-
-    return *this;
+// S21Matrix &S21Matrix::operator = (S21Matrix &other){
+//     if (this != &other) {
+//         std::swap(rows_, other.rows_);
+//         std::swap(cols_, other.cols_);
+//         for (int i = 0; i < rows_; i++) {
+//             for (int j = 0; j < cols_; j++) {
+//                 matrix_[i][j] = other.matrix_[i][j];
+//             }
+//         }
+//     }
+//     return *this;
+// }
+void S21Matrix::operator = (S21Matrix&& other_matrix) {
+    std::swap(*this, other_matrix);
 }
 void  S21Matrix::operator += (S21Matrix &other){
     SumMatrix(other);
@@ -380,7 +413,15 @@ void  S21Matrix::operator *= (double num){
     MulNumber(num);
 }
 
-double S21Matrix::operator()(int rows, int cols) {
+double S21Matrix::operator()(int rows, int cols)const{
+    if (rows >= rows_ || cols >= cols_) {
+        throw std::logic_error("\nIndex out of range\n");
+    }
+    return matrix_[rows][cols];
+}
+
+// setting an element
+double &S21Matrix::operator()(int rows, int cols) {
     if (rows >= rows_ || cols >= cols_) {
         throw std::logic_error("\nIndex out of range\n");
     }

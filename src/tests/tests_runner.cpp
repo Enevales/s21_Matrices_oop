@@ -56,7 +56,7 @@ TEST(support_func, set_element){
     double num = 1;
     for (int i = 0; i < x.GetRows(); i++) {
         for (int j = 0; j < x.GetColumns(); j++) {
-        x.SetElement(i, j, num);
+        x(i, j) = num;
         num++;
         }
     }
@@ -97,6 +97,136 @@ TEST(matrix_operations, eq_matrix_02){
     ASSERT_FALSE(y.EqMatrix(x));
     ASSERT_FALSE(x.EqMatrix(y));
 }
+
+TEST(matrix_operations, sum_matrix_00){
+    S21Matrix x(2, 2);
+    x.FillMatrix(0);
+    S21Matrix y(x);
+    x.SumMatrix(y);
+    ASSERT_FALSE(y.EqMatrix(x));
+    ASSERT_FALSE(x.EqMatrix(y));
+    ASSERT_EQ(x(0, 0), 0);
+    ASSERT_EQ(x(1, 0), 4);
+}
+
+TEST(matrix_operations, sub_matrix_00){
+    S21Matrix x(2, 2);
+    x.FillMatrix(0);
+    S21Matrix y(x);
+    x.SubMatrix(y);
+    ASSERT_EQ(x(0, 0), 0);
+    ASSERT_EQ(x(0, 1), 0);
+    ASSERT_EQ(x(1, 0), 0);
+    ASSERT_EQ(x(1, 1), 0);
+}
+
+TEST(matrix_operations, sub_matrix_01){
+    S21Matrix x(2, 2);
+    x.FillMatrix(5);
+    S21Matrix y(2, 2);
+    y.FillMatrix(1);
+    x.SubMatrix(y);
+    ASSERT_EQ(x(0, 0), 4);
+    ASSERT_EQ(y(0, 1), 2);
+    y.SubMatrix(x);
+    ASSERT_EQ(y(1, 0), -1);
+    ASSERT_EQ(y(1, 1), 0);
+}
+
+TEST(matrix_operations, mul_number_00){
+    S21Matrix x;
+    x.FillMatrix(5);
+    x.MulNumber(1000);
+    ASSERT_EQ(x(0, 0), 5000);
+    ASSERT_EQ(x(2, 1), 12000);
+    x *= -1;
+    ASSERT_EQ(x(0, 0), -5000);
+    ASSERT_EQ(x(2, 1), -12000);
+}
+
+TEST(matrix_operations, mul_matrix_00){
+    S21Matrix x(2, 3);
+    x.FillMatrix(2);
+    S21Matrix y(3, 2);
+    y.FillMatrix(3);
+    x.MulMatrix(y);
+    S21Matrix check(2,2);
+    check(0, 0) = 49;
+    check(0, 1) = 58;
+    check(1, 0) = 94;
+    check(1, 1) = 112;    
+
+    ASSERT_EQ(x.EqMatrix(check), 1);
+}
+
+TEST(matrix_operations, transpose_00){
+    S21Matrix x(3, 2);
+    x.FillMatrix(2);
+    S21Matrix res = x.Transpose();
+    S21Matrix check(2,3);
+    check(0, 0) = 2;
+    check(0, 1) = 4;
+    check(0, 2) = 6;
+    check(1, 0) = 3;
+    check(1, 1) = 5;
+    check(1, 2) = 7;  
+    ASSERT_EQ(res.EqMatrix(check), 1);
+}
+
+
+TEST(matrix_operations, determinant_00){
+    S21Matrix x(3, 3);
+    x.FillMatrix(2);
+    S21Matrix y = x.Transpose();
+    ASSERT_EQ(x.Determinant(), 0);
+    ASSERT_EQ(y.Determinant(), 0);
+}
+
+TEST(matrix_operations, determinant_01){
+    S21Matrix x(2, 2);
+    x(0, 0) = 7;
+    x(0, 1) = 5;
+    x(1, 0) = 3;
+    x(1, 1) = 9;
+    ASSERT_EQ(x.Determinant(), 48);
+}
+
+TEST(matrix_operations, determinant_02){
+    S21Matrix x(4, 4);
+    x.FillMatrix(1);
+    S21Matrix y = x.Transpose();
+    y(1, 1) = 14;
+    y(2, 2) = 13;
+    ASSERT_EQ(y.Determinant(), -576);
+}
+
+// TEST(matrix_operations, complements_00){
+//     S21Matrix x(2, 2);
+//     x(0, 0) = -666;
+//     x(0, 1) = -73;
+//     x(1, 0) = -21000;
+//     x(1, 1) = -36;
+//     S21Matrix y = x.CalcComplements();
+
+//     ASSERT_EQ(y(0, 0), -36);
+//     ASSERT_EQ(y(0, 1), 21000);
+//     ASSERT_EQ(y(1, 0), 73);
+//     ASSERT_EQ(y(1, 1), -666);
+// }
+
+// TEST(matrix_operations, complements_01){
+//     S21Matrix x(2, 2);
+//     x(0, 0) = -6;
+//     x(0, 1) = 7;
+//     x(1, 0) = 21;
+//     x(1, 1) = 3;
+//     S21Matrix y = x.CalcComplements();
+
+//     ASSERT_EQ(y(0, 0), 3);
+//     ASSERT_EQ(y(0, 1), -21);
+//     ASSERT_EQ(y(1, 0), -7);
+//     ASSERT_EQ(y(1, 1), -6);
+// }
 
 
 int main(int argc, char **argv) {

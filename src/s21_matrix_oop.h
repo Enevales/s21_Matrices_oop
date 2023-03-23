@@ -38,6 +38,8 @@ class S21Matrix {
         void SetElement(int row, int col, double value);
         void FillMatrix(double num);
 
+        void CopyMatrix(const S21Matrix& other);
+
         // MATRIX OPERATIONS
 
         bool EqMatrix(const S21Matrix& other);
@@ -57,13 +59,14 @@ class S21Matrix {
         S21Matrix operator * (const S21Matrix &other);
         S21Matrix operator * (double num);
         bool operator == (S21Matrix &other);
-        S21Matrix& operator = (S21Matrix &&other);
+        void operator = (S21Matrix &&other);
         void operator += (S21Matrix &other);
         void operator -= (S21Matrix &other);
         void operator *= (S21Matrix &other);
         void operator *= (double num);
 
-        double operator()(int rows, int cols);
+        double operator()(int rows, int cols) const;
+        double & operator()(int rows, int cols);
 };
 
 
