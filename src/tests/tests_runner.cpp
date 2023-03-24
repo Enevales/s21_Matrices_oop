@@ -200,34 +200,104 @@ TEST(matrix_operations, determinant_02){
     ASSERT_EQ(y.Determinant(), -576);
 }
 
-// TEST(matrix_operations, complements_00){
-//     S21Matrix x(2, 2);
-//     x(0, 0) = -666;
-//     x(0, 1) = -73;
-//     x(1, 0) = -21000;
-//     x(1, 1) = -36;
-//     S21Matrix y = x.CalcComplements();
+TEST(matrix_operations, complements_00){
+    S21Matrix x(2, 2);
+    x(0, 0) = -666;
+    x(0, 1) = -73;
+    x(1, 0) = -21000;
+    x(1, 1) = -36;
+    S21Matrix y = x.CalcComplements();
 
-//     ASSERT_EQ(y(0, 0), -36);
-//     ASSERT_EQ(y(0, 1), 21000);
-//     ASSERT_EQ(y(1, 0), 73);
-//     ASSERT_EQ(y(1, 1), -666);
-// }
+    ASSERT_EQ(y(0, 0), -36);
+    ASSERT_EQ(y(0, 1), 21000);
+    ASSERT_EQ(y(1, 0), 73);
+    ASSERT_EQ(y(1, 1), -666);
+}
 
-// TEST(matrix_operations, complements_01){
-//     S21Matrix x(2, 2);
-//     x(0, 0) = -6;
-//     x(0, 1) = 7;
-//     x(1, 0) = 21;
-//     x(1, 1) = 3;
-//     S21Matrix y = x.CalcComplements();
+TEST(matrix_operations, complements_01){
+    S21Matrix x(2, 2);
+    x(0, 0) = -6;
+    x(0, 1) = 7;
+    x(1, 0) = 21;
+    x(1, 1) = 3;
+    S21Matrix y = x.CalcComplements();
 
-//     ASSERT_EQ(y(0, 0), 3);
-//     ASSERT_EQ(y(0, 1), -21);
-//     ASSERT_EQ(y(1, 0), -7);
-//     ASSERT_EQ(y(1, 1), -6);
-// }
+    ASSERT_EQ(y(0, 0), 3);
+    ASSERT_EQ(y(0, 1), -21);
+    ASSERT_EQ(y(1, 0), -7);
+    ASSERT_EQ(y(1, 1), -6);
+}
 
+TEST(matrix_operations, complements_02){
+    S21Matrix x;
+    S21Matrix y;
+    x(0, 0) = 3;
+    x(0, 1) = 4;
+    x(0, 2) = 3;
+    x(1, 0) = 1;
+    x(1, 1) = 2;
+    x(1, 2) = 3;
+    x(2, 0) = 0;
+    x(2, 1) = 7;
+    x(2, 2) = 7;
+
+    y(0, 0) = -7;
+    y(0, 1) = -7;
+    y(0, 2) = 7;
+    y(1, 0) = -7;
+    y(1, 1) = 21;
+    y(1, 2) = -21;
+    y(2, 0) = 6;
+    y(2, 1) = -6;
+    y(2, 2) = 2;
+
+    S21Matrix res = x.CalcComplements();
+    ASSERT_EQ(res.EqMatrix(y), true);
+}
+
+TEST(matrix_operations, inverse_00){
+    S21Matrix x;
+
+    x(0, 0) = 2;
+    x(0, 1) = 5;
+    x(0, 2) = 7;
+    x(1, 0) = 6;
+    x(1, 1) = 3;
+    x(1, 2) = 4;
+    x(2, 0) = 5;
+    x(2, 1) = -2;
+    x(2, 2) = -3;
+
+    S21Matrix res = x.InverseMatrix();
+
+    EXPECT_EQ(res(0, 0), 1);
+    EXPECT_EQ(res(0, 1), -1);
+    EXPECT_EQ(res(0, 2), 1);
+    EXPECT_EQ(res(1, 0), -38);
+    EXPECT_EQ(res(1, 1), 41);
+    EXPECT_EQ(res(1, 2), -34);
+    EXPECT_EQ(res(2, 0), 27);
+    EXPECT_EQ(res(2, 1), -29);
+    EXPECT_EQ(res(2, 2), 24);
+}
+
+TEST(support_func, resize_00){
+    S21Matrix x;
+    x.FillMatrix(0);
+    x.SetRows(4);
+    ASSERT_EQ(x.GetRows(), 4);
+    EXPECT_EQ(x(0, 2), 2);
+    EXPECT_EQ(x(3, 0), 0);
+}
+
+TEST(support_func, resize_01){
+    S21Matrix x;
+    x.FillMatrix(0);
+    x.SetColumns(4);
+    ASSERT_EQ(x.GetColumns(), 4);
+    EXPECT_EQ(x(0, 2), 2);
+    EXPECT_EQ(x(1, 3), 0);
+}
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

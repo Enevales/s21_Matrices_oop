@@ -56,6 +56,7 @@ void S21Matrix::DeleteMatrix(){
     }
 }
 
+
 /**
  * @brief filling matrix with gradually
  * incremented numbers, so that every
@@ -81,6 +82,31 @@ void S21Matrix::CopyMatrix(const S21Matrix& other) {
             matrix_[i][j] = other.matrix_[i][j];
         }
     }
+}
+
+void S21Matrix::SetRows(int rows){
+    if (rows <= 0) throw std::length_error("The number of rows must be greater than zero!");
+
+    S21Matrix NewMatrix(rows, cols_);
+    for (int i = 0; i < std::min(rows_, rows); i++) {
+        for (int j = 0; j < cols_; j++) {
+            NewMatrix.matrix_[i][j] = matrix_[i][j];
+        }
+    }
+    CopyMatrix(NewMatrix);
+    // NewMatrix.DeleteMatrix();
+}
+
+void S21Matrix::SetColumns(int cols){
+    if (cols <= 0) throw std::length_error("The number of rows must be greater than zero!");
+
+    S21Matrix NewMatrix(rows_, cols);
+    for (int i = 0; i < rows_; i++) {
+        for (int j = 0; j < std::min(cols_, cols); j++) {
+            NewMatrix.matrix_[i][j] = matrix_[i][j];
+        }
+    }
+    CopyMatrix(NewMatrix);
 }
 
 
@@ -213,7 +239,7 @@ void S21Matrix::MulMatrix(const S21Matrix& other){
         }
     }
     CopyMatrix(res);
-    res.DeleteMatrix();
+    res.DeleteMatrix();  // eeehh????
 }
 
 /**
@@ -294,42 +320,24 @@ double S21Matrix::Determinant() {
  *         0 - function runs without any errors.
 */
 
-// S21Matrix S21Matrix::CalcComplements(){
-//     if(!this->is_square())
-//     throw std::length_error("The matrix should be square!");
-//     S21Matrix res(*this);
-//     S21Matrix temp(rows_-1, cols_-1);
-//     for (int i = 0; i < rows_; i++) {
-//       for (int j = 0; j < cols_; j++) {
-//         temp.(i, j);
-//         if (temp.Determinant()) break;
-//         if ((i + j + 2) % 2 != 0) res.matrix_[i][j] *= -1;
-//       }
+S21Matrix S21Matrix::CalcComplements(){
+    if(!this->is_square())
+    throw std::length_error("The matrix should be square!");
+    if(!this->Determinant())
+    throw std::logic_error("The determinant shouldn't be equal to zero!");
+    S21Matrix res(*this);
+    // S21Matrix temp(rows_-1, cols_-1);
+    for (int i = 0; i < rows_; i++) {
+      for (int j = 0; j < cols_; j++) {
+        S21Matrix temp = SubMatrix(i, j);
+        // if (temp.Determinant()) break;
+        res.matrix_[i][j] = temp.Determinant();
+        if ((i + j + 2) % 2 != 0) res.matrix_[i][j] *= -1;
+      }
+    }
+    return res;
+}
 
-//     }
-//     return res;
-// }
-
-// int s21_calc_complements(matrix_t *A, matrix_t *result) {
-//   if (!valid_matrix(A)) return INCORRECT_MATRIX;
-//   if (A->columns != A->rows) {
-//     return CALCULATION_ERROR;
-//   }
-//   int error = s21_create_matrix(A->rows, A->columns, result);
-//   if (!error) {
-//     matrix_t temp = {0};
-//     s21_create_matrix(A->rows - 1, A->columns - 1, &temp);
-//     for (int i = 0; i < A->rows; i++) {
-//       for (int j = 0; j < A->columns; j++) {
-//         submatrix(i, j, A, &temp);
-//         if (s21_determinant(&temp, &result->matrix[i][j])) break;
-//         if ((i + j + 2) % 2 != 0) result->matrix[i][j] *= -1;
-//       }
-//     }
-//     s21_remove_matrix(&temp);
-//   }
-//   return error;
-// }
 
 /**
  * @brief finds inverse of a square matrix
@@ -350,9 +358,8 @@ S21Matrix S21Matrix::InverseMatrix() {
     double det = this->Determinant();
     if (det == 0)
     throw std::out_of_range("The determinant should be bigger than zero!");
-    S21Matrix res(rows_, cols_);
-    S21Matrix temp_0 = this->CalcComplements();
-    S21Matrix temp_1 = this->Transpose();
+    S21Matrix temp = this->CalcComplements();
+    S21Matrix res = temp.Transpose();
     res.MulNumber(1 / det);
     return res;
 }
