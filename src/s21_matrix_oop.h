@@ -38,7 +38,7 @@ class S21Matrix {
         void SetElement(int row, int col, double value);
         void FillMatrix(double num);
 
-        void CopyMatrix(const S21Matrix& other);
+        void CopyMatrix(S21Matrix& other);
 
         // MATRIX OPERATIONS
 
@@ -53,7 +53,8 @@ class S21Matrix {
         S21Matrix InverseMatrix();
         
         // OVERLOADED OPERATORS
-        
+
+        S21Matrix operator = (S21Matrix &other);
         S21Matrix operator + (const S21Matrix &other);
         S21Matrix operator - (const S21Matrix &other);
         S21Matrix operator * (const S21Matrix &other);
