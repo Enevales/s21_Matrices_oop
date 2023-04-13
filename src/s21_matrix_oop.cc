@@ -28,7 +28,7 @@ S21Matrix::S21Matrix(const S21Matrix &other) : rows_(other.rows_), cols_(other.c
 }
 
  // Move constructor
-S21Matrix::S21Matrix(S21Matrix&& other) : rows_(other.rows_), cols_(other.cols_), matrix_(other.matrix_) {
+S21Matrix::S21Matrix(S21Matrix&& other): rows_(other.rows_), cols_(other.cols_), matrix_(other.matrix_) {
   other.rows_ = 0;
   other.cols_ = 0;
   other.matrix_ = nullptr;
@@ -39,11 +39,12 @@ S21Matrix::S21Matrix(S21Matrix&& other) : rows_(other.rows_), cols_(other.cols_)
  S21Matrix::~S21Matrix() { DeleteMatrix(); }
 
 
-void S21Matrix::CreateMatrix(int rows, int cols){
+S21Matrix &S21Matrix::CreateMatrix(int rows, int cols){
     matrix_ = new double*[rows];
     for (int i = 0; i < rows; i++) {
         matrix_[i] = new double[cols]();
     }
+    return *this;
 }
 
 void S21Matrix::DeleteMatrix(){
@@ -57,13 +58,6 @@ void S21Matrix::DeleteMatrix(){
 }
 
 
-/**
- * @brief filling matrix with gradually
- * incremented numbers, so that every
- * element is greater than one before.
- *
- * @param num starting value
-*/
 void S21Matrix::FillMatrix(double num){
     for (int i = 0; i < rows_; i++) {
         for (int j = 0; j < cols_; j++) {
@@ -73,56 +67,35 @@ void S21Matrix::FillMatrix(double num){
     }
 }
 
-void S21Matrix::CopyMatrix(S21Matrix& other) {
-    // rows_ = other.rows_;
-    // cols_ = other.cols_;
-    // CreateMatrix(rows_, cols_);
-    // for (int i = 0; i < rows_; i++) {
-    //     for (int j = 0; j < cols_; j++) {
-    //         matrix_[i][j] = other.matrix_[i][j];
-    //     }
-    // }
-    std::swap(*this, other);
-}
 
-void S21Matrix::SetRows(int rows){
+void S21Matrix::SetRows(const int rows){
     if (rows <= 0) throw std::length_error("The number of rows must be greater than zero!");
-
-    S21Matrix NewMatrix(rows, cols_);
+    S21Matrix res(rows, cols_);
     for (int i = 0; i < std::min(rows_, rows); i++) {
         for (int j = 0; j < cols_; j++) {
-            NewMatrix.matrix_[i][j] = matrix_[i][j];
+            res.matrix_[i][j] = matrix_[i][j];
         }
     }
-    CopyMatrix(NewMatrix);
-    // NewMatrix.DeleteMatrix();
+    DeleteMatrix();
+    *this = std::move(res);
 }
 
-void S21Matrix::SetColumns(int cols){
+void S21Matrix::SetColumns(const int cols){
     if (cols <= 0) throw std::length_error("The number of rows must be greater than zero!");
 
-    S21Matrix NewMatrix(rows_, cols);
+    S21Matrix res(rows_, cols);
     for (int i = 0; i < rows_; i++) {
         for (int j = 0; j < std::min(cols_, cols); j++) {
-            NewMatrix.matrix_[i][j] = matrix_[i][j];
+            res.matrix_[i][j] = matrix_[i][j];
         }
     }
-    CopyMatrix(NewMatrix);
+    DeleteMatrix();
+    *this = std::move(res);
 }
 
 
 // MATRIX OPERATIONS
 
-/**
- * @brief creates n-1 order mattrix in
- * which it stores matrix created by
- * deleting given row and column.
- *
- * @param row - certain row from a larger matrix
- * that is not going to end in the resulting matrix.
- * @param column - certain column from a larger matrix
- * that is not going to end in the resulting matrix.
-*/
 S21Matrix S21Matrix::SubMatrix(int row, int column) {
     S21Matrix sub(rows_-1, cols_-1);
     int m = 0;
@@ -140,14 +113,7 @@ S21Matrix S21Matrix::SubMatrix(int row, int column) {
     return sub;
 }
 
-/**
- * @brief compares two matrices element
- * by element. Comparison is up to and
- * including 7 decimal places.
- *
- * @return TRUE (1) if matrices are equal.
- * FALSE (0) if matrices are not equal.
-*/
+
 
 bool S21Matrix::EqMatrix(const S21Matrix& other) {
   bool is_equal = true;
@@ -163,14 +129,6 @@ bool S21Matrix::EqMatrix(const S21Matrix& other) {
   return is_equal;
 }
 
-/**
- * @brief The sum of two matrices.
- * @return 1 - matrix A  or B is invalid;
-           2 - number of rows or/and columns of first
- * matrix isn't equal to number of rows & columns of second
- * matrix.
- *         0 - function runs without any errors.
-*/
 void S21Matrix::SumMatrix(const S21Matrix& other){
     if ((rows_ != other.rows_) || (cols_ != other.cols_)){
         throw std::logic_error("The sizes of two matrixes are not equal!");
@@ -182,14 +140,7 @@ void S21Matrix::SumMatrix(const S21Matrix& other){
     }
 }
 
-/**
- * @brief subtracting matrices.
- * @return 1 - matrix A  or B is invalid;
-           2 - number of rows or/and columns of first
- * matrix isn't equal to number of rows & columns of second
- * matrix.
- *         0 - function runs without any errors.
-*/
+
 void S21Matrix::SubMatrix(const S21Matrix& other) {
     if ((rows_ != other.rows_) || (cols_ != other.cols_)){
         throw std::logic_error("The sizes of two matrixes are not equal!");
@@ -201,13 +152,7 @@ void S21Matrix::SubMatrix(const S21Matrix& other) {
     }
 }
 
-/**
- * @brief Scalar multiplication.
- * Each element is multiplied by a scalar value.
- * @param number - double value we multiply with matrix.
- * @return 1 - matrix A is invalid or allocation is failed;
- *         0 - function runs without any errors.
-*/
+
 void  S21Matrix::MulNumber(const double num) {
     for (int i = 0; i < rows_; i++) {
         for (int j = 0; j < cols_; j++) {
@@ -216,17 +161,7 @@ void  S21Matrix::MulNumber(const double num) {
     }
 }
 
-/**
- * @brief Multiplication of two matrices.
- * Multiplying each element of the column of the
- * first matrix with each element of rows of the
- * second matrix and add them all.
- *
- * @return 1 - matrix A or matrix B is invalid;
- *         2 - num. of columns of first matrix doesn't correspond
- * to num. of rows of second matrix.
- *         0 - function runs without any errors.
-*/
+
 void S21Matrix::MulMatrix(const S21Matrix& other){
     if (cols_ != other.rows_ || rows_ != other.cols_) {
         throw std::length_error("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
@@ -239,16 +174,9 @@ void S21Matrix::MulMatrix(const S21Matrix& other){
             }
         }
     }
-    CopyMatrix(res);
+    *this = res;
 }
 
-/**
- * @brief switches matrix rows with its columns with
- * their numbers retained
- *
- * @return 1 - matrix is invalid or allocation is failed;
- *         0 - function runs without any errors.
-*/
 
 S21Matrix S21Matrix::Transpose(){
     S21Matrix res(cols_, rows_);
@@ -276,17 +204,7 @@ S21Matrix S21Matrix::SubMatrix_min(int column) {
   return res;
 }
 
-/**
- * @brief recursive function, that finds
- * a determinant of a square matrix. It refers
- * to itself, if order of a given matrix is
- * greater than 2.
- *
- * @return 1 - matrix is invalid;
- *         2 - matrix is not square (if matrix)
- * doesn't have same number of rows & columns;
- *         0 - function runs without any errors.
-*/
+
 double S21Matrix::Determinant() {
     if(!this->is_square())
     throw std::length_error("The matrix should be square!");
@@ -308,17 +226,7 @@ double S21Matrix::Determinant() {
   }
   return det;
 }
-/**
- * @brief find the matrix of algebraic complements
- * of a given SQUARE matrix by finding minor of each element,
- * (determinant of a submatrix obtained by deleting out the
- * i-th row and the j-th column) and multiplying each
- * minor by -1^(i+j)
- *
- * @return 1 - matrix is invalid or allocation is failed;
- *         2 - given matrix isn't square.
- *         0 - function runs without any errors.
-*/
+
 
 S21Matrix S21Matrix::CalcComplements(){
     if(!this->is_square())
@@ -337,20 +245,6 @@ S21Matrix S21Matrix::CalcComplements(){
     }
     return res;
 }
-
-
-/**
- * @brief finds inverse of a square matrix
- * by constructing matrix of algebraic
- * complements, then transposing it and multiplying
- * each element of a matrix by 1/det(A).
- *
- * @return 1 - matrix is invalid;
- *         2 - matrix is not square (if matrix)
- * doesn't have same number of rows & columns or determinant of a matrix is
- ZERO;
- *         0 - function runs without any errors.
-*/
 
 S21Matrix S21Matrix::InverseMatrix() {
     if(!this->is_square())
@@ -392,7 +286,7 @@ bool  S21Matrix::operator == (S21Matrix &other){
 
 /*Заметьте, что деструктор при присвоении не вызывается. Это означает, что в реализации copy assignment
  следует освобождать старые ресурсы перед присвоением новых значений.*/
-S21Matrix S21Matrix::operator = (S21Matrix &other){
+S21Matrix  S21Matrix::operator = (S21Matrix &other){
     if (this != &other) {
         std::swap(rows_, other.rows_);
         std::swap(cols_, other.cols_);
@@ -404,9 +298,19 @@ S21Matrix S21Matrix::operator = (S21Matrix &other){
     }
     return *this;
 }
-void S21Matrix::operator = (S21Matrix&& other_matrix) {
-    std::swap(*this, other_matrix);
+
+// assignment operator that will accept a temporary object.
+
+S21Matrix S21Matrix::operator = (S21Matrix&& other){
+  rows_ = other.rows_;
+  cols_  = other.cols_;
+  matrix_ = other.matrix_;
+  other.rows_ = 0;
+  other.cols_ = 0;
+  other.matrix_ = nullptr;
+  return *this;
 }
+
 void  S21Matrix::operator += (S21Matrix &other){
     SumMatrix(other);
 }

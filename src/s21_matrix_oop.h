@@ -3,7 +3,7 @@
 
 #include <stdexcept>
 #include <math.h>
-
+#include <iostream> // delete
 #define EPS 1e-7
 
 class S21Matrix {
@@ -29,16 +29,14 @@ class S21Matrix {
         }
         int GetRows() const{ return rows_;}
         int GetColumns() const{ return cols_;}
-        void SetRows(int rows);
-        void SetColumns(int cols);
-        void CreateMatrix(int rows, int cols);
+        void SetRows(const int rows);
+        void SetColumns(const int cols);
+        S21Matrix &CreateMatrix(int rows, int cols);
         void DeleteMatrix();
         S21Matrix SubMatrix(int row, int column);
         S21Matrix SubMatrix_min(int column);
         void SetElement(int row, int col, double value);
         void FillMatrix(double num);
-
-        void CopyMatrix(S21Matrix& other);
 
         // MATRIX OPERATIONS
 
@@ -55,12 +53,12 @@ class S21Matrix {
         // OVERLOADED OPERATORS
 
         S21Matrix operator = (S21Matrix &other);
+        S21Matrix operator = (S21Matrix&& other);
         S21Matrix operator + (const S21Matrix &other);
         S21Matrix operator - (const S21Matrix &other);
         S21Matrix operator * (const S21Matrix &other);
         S21Matrix operator * (double num);
         bool operator == (S21Matrix &other);
-        void operator = (S21Matrix &&other);
         void operator += (S21Matrix &other);
         void operator -= (S21Matrix &other);
         void operator *= (S21Matrix &other);

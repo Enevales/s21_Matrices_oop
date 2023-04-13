@@ -45,10 +45,13 @@ TEST(constructors, copy_matrix_01){
 }
 
 TEST(constructors, move_matrix){
-    S21Matrix x = S21Matrix(5,5);
-    ASSERT_EQ(x.is_square(), 1);
-    ASSERT_EQ(x.GetColumns(), 5);
-    ASSERT_EQ(x.GetRows(), 5);
+    S21Matrix x(4,2);
+    x.FillMatrix(1);
+    S21Matrix y = std::move(x);
+    ASSERT_EQ(y.GetColumns(), 2);
+    ASSERT_EQ(y.GetRows(),4);
+    ASSERT_EQ(y(0, 0), 1);
+    ASSERT_EQ(y(1, 0), 3);
 }
 
 TEST(support_func, set_element){
@@ -155,8 +158,6 @@ TEST(matrix_operations, sub_matrix_01){
     ASSERT_EQ(z(0, 0), 7);
     ASSERT_EQ(z(0, 1), 6);
 }
-
-
 
 TEST(matrix_operations, mul_number_00){
     S21Matrix x;
@@ -320,23 +321,33 @@ TEST(matrix_operations, inverse_00){
     EXPECT_EQ(res(2, 2), 24);
 }
 
-// TEST(support_func, resize_00){
-//     S21Matrix x;
-//     x.FillMatrix(0);
-//     x.SetRows(4);
-//     ASSERT_EQ(x.GetRows(), 4);
-//     EXPECT_EQ(x(0, 2), 2);
-//     EXPECT_EQ(x(3, 0), 0);
-// }
+TEST(support_func, resize_00){
+    S21Matrix x;
+    x.FillMatrix(0);
+    x.SetRows(4);
+    ASSERT_EQ(x.GetRows(), 4);
+    EXPECT_EQ(x(0, 2), 2);
+    EXPECT_EQ(x(3, 0), 0);
+}
 
-// TEST(support_func, resize_01){
-//     S21Matrix x;
-//     x.FillMatrix(0);
-//     x.SetColumns(4);
-//     ASSERT_EQ(x.GetColumns(), 4);
-//     EXPECT_EQ(x(0, 2), 2);
-//     EXPECT_EQ(x(1, 3), 0);
-// }
+TEST(support_func, resize_01){
+    S21Matrix x;
+    x.FillMatrix(0);
+    x.SetColumns(4);
+    ASSERT_EQ(x.GetColumns(), 4);
+    EXPECT_EQ(x(0, 2), 2);
+    EXPECT_EQ(x(1, 3), 0);
+}
+TEST(support_func, resize_02){
+    S21Matrix x;
+    x.FillMatrix(0);
+    x.SetRows(2);
+    x.SetColumns(2);
+    ASSERT_EQ(x.GetRows(), 2);
+    ASSERT_EQ(x.GetColumns(), 2);
+    EXPECT_EQ(x(0, 1), 1);
+    EXPECT_EQ(x(1, 0), 3);
+}
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
