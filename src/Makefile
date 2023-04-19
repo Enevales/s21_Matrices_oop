@@ -16,11 +16,11 @@ endif
 
 all: clean s21_matrix_oop.a test
 
-test: 
-	$(CC) s21_matrix_oop.cc $(PREF_TEST)tests_runner.cc $(CPPFLAGS) $(LDLIBS) $(COVFLAGS) #-fsanitize=address
+test: $(LIB)
+	$(CC) $(PREF_TEST)tests_runner.cc $(COVFLAGS) $(LDLIBS) -L. $(LIB)
 	./a.out
 
-$(LIB): s21_matrix_oop.cc
+$(LIB): s21_matrix_oop.o
 	ar rcs $(LIB) $^
 	ranlib $(LIB)
 
@@ -28,9 +28,9 @@ $(LIB): s21_matrix_oop.cc
 	$(CC) $(CFLAGS) -c $< -o $@
 
 gcov_report:
-	gcov -f  %.cc
+	# gcov -f  %.cc
 	lcov -t "gcov_report" --no-external -o Coverage_Report.info -c -d .
-	genhtml -o ./report Coverage_Report.info
+	# genhtml -o ./report Coverage_Report.info
 	$(OPEN_CM) ./report/index-sort-f.html
 
 

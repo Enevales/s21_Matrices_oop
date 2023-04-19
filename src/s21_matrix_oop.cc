@@ -164,7 +164,7 @@ void  S21Matrix::MulNumber(const double num) {
 
 void S21Matrix::MulMatrix(const S21Matrix& other){
     if (cols_ != other.rows_ || rows_ != other.cols_) {
-        throw std::length_error("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
+        throw std::logic_error("num. of columns of first matrix doesn't correspond to num. of rows of second matrix.");
     }
     S21Matrix res(rows_, other.cols_);
     for (int i = 0; i < res.rows_; i++) {
@@ -231,14 +231,12 @@ double S21Matrix::Determinant() {
 S21Matrix S21Matrix::CalcComplements(){
     if(!this->is_square())
     throw std::length_error("The matrix should be square!");
-    if(!this->Determinant())
+    if(this->Determinant() == 0)
     throw std::logic_error("The determinant shouldn't be equal to zero!");
     S21Matrix res(*this);
-    // S21Matrix temp(rows_-1, cols_-1);
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
         S21Matrix temp = SubMatrix(i, j);
-        // if (temp.Determinant()) break;
         res.matrix_[i][j] = temp.Determinant();
         if ((i + j + 2) % 2 != 0) res.matrix_[i][j] *= -1;
       }
@@ -251,7 +249,7 @@ S21Matrix S21Matrix::InverseMatrix() {
     throw std::length_error("The matrix should be square!");
     double det = this->Determinant();
     if (det == 0)
-    throw std::out_of_range("The determinant should be bigger than zero!");
+    throw std::logic_error("The determinant should be greater than zero!");
     S21Matrix temp = this->CalcComplements();
     S21Matrix res = temp.Transpose();
     res.MulNumber(1 / det);
@@ -284,8 +282,6 @@ bool  S21Matrix::operator == (S21Matrix &other){
     return EqMatrix(other); 
 }
 
-/*Заметьте, что деструктор при присвоении не вызывается. Это означает, что в реализации copy assignment
- следует освобождать старые ресурсы перед присвоением новых значений.*/
 S21Matrix  S21Matrix::operator = (S21Matrix &other){
     if (this != &other) {
         std::swap(rows_, other.rows_);
@@ -324,17 +320,10 @@ void  S21Matrix::operator *= (double num){
     MulNumber(num);
 }
 
-double S21Matrix::operator()(int rows, int cols)const{
-    if (rows >= rows_ || cols >= cols_) {
-        throw std::logic_error("\nIndex out of range\n");
-    }
-    return matrix_[rows][cols];
-}
 
-// setting an element
 double &S21Matrix::operator()(int rows, int cols) {
     if (rows >= rows_ || cols >= cols_) {
-        throw std::logic_error("\nIndex out of range\n");
+        throw std::out_of_range("\nIndex out of range\n");
     }
     return matrix_[rows][cols];
 }

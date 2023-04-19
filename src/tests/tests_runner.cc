@@ -1,89 +1,90 @@
 #include <gtest/gtest.h>
+
 #include <ostream>
 
 #include "../s21_matrix_oop.h"
 
-TEST(constructors, default_){
+TEST(constructors, default_) {
     S21Matrix x;
     S21Matrix y;
     ASSERT_EQ(x.GetRows(), 3);
     ASSERT_EQ(y.GetColumns(), 3);
 
     for (int i = 0; i < x.GetRows(); ++i) {
-        for (int j = 0; j < x.GetColumns(); j++){
+        for (int j = 0; j < x.GetColumns(); j++) {
             EXPECT_EQ(x(i, j), 0) << "The matrix should be filled with zeros ";
         }
     }
+    ASSERT_THROW(S21Matrix t(0, -8), std::out_of_range);
 }
 
-
-TEST(constructors, is_square){
+TEST(constructors, is_square) {
     S21Matrix x(3, 3);
     S21Matrix y(3, 2);
     ASSERT_EQ(x.is_square(), 1);
     ASSERT_EQ(y.is_square(), 0);
 }
 
-TEST(constructors, copy_matrix_00){
+TEST(constructors, copy_matrix_00) {
     const S21Matrix y(3, 4);
     S21Matrix copy(y);
     EXPECT_EQ(copy.GetRows(), y.GetRows());
     EXPECT_EQ(copy.GetColumns(), y.GetColumns());
 }
 
-TEST(constructors, copy_matrix_01){
+TEST(constructors, copy_matrix_01) {
     S21Matrix y(3, 4);
     y.FillMatrix(0);
     S21Matrix x(y);
     ASSERT_EQ(x.GetRows(), y.GetRows());
     ASSERT_EQ(x.GetColumns(), y.GetColumns());
     for (int i = 0; i < x.GetRows(); ++i) {
-        for (int j = 0; j < x.GetColumns(); j++){
+        for (int j = 0; j < x.GetColumns(); j++) {
             EXPECT_EQ(x(i, j), y(i, j));
         }
     }
 }
 
-TEST(constructors, move_matrix){
-    S21Matrix x(4,2);
+TEST(constructors, move_matrix) {
+    S21Matrix x(4, 2);
     x.FillMatrix(1);
     S21Matrix y = std::move(x);
     ASSERT_EQ(y.GetColumns(), 2);
-    ASSERT_EQ(y.GetRows(),4);
+    ASSERT_EQ(y.GetRows(), 4);
     ASSERT_EQ(y(0, 0), 1);
     ASSERT_EQ(y(1, 0), 3);
 }
 
-TEST(support_func, set_element){
+TEST(support_func, set_element) {
     S21Matrix x;
     double num = 1;
     for (int i = 0; i < x.GetRows(); i++) {
         for (int j = 0; j < x.GetColumns(); j++) {
-        x(i, j) = num;
-        num++;
+            x(i, j) = num;
+            num++;
         }
     }
-    ASSERT_EQ(x(0,0), 1) << "Vectors x and y are of unequal length";
-    ASSERT_EQ(x(0,1), 2) << "Vectors x and y are of unequal length";
-    ASSERT_EQ(x(1,0), 4) << "Vectors x and y are of unequal length";
+    ASSERT_EQ(x(0, 0), 1) << "Vectors x and y are of unequal length";
+    ASSERT_EQ(x(0, 1), 2) << "Vectors x and y are of unequal length";
+    ASSERT_EQ(x(1, 0), 4) << "Vectors x and y are of unequal length";
 }
 
-TEST(support_func, fill_matrix){
+TEST(support_func, fill_matrix) {
     S21Matrix x;
     double num = 1;
     x.FillMatrix(num);
-    ASSERT_EQ(x(0,0), 1) << "Vectors x and y are of unequal length";
-    ASSERT_EQ(x(0,1), 2) << "Vectors x and y are of unequal length";
-    ASSERT_EQ(x(1,0), 4) << "Vectors x and y are of unequal length";
+    ASSERT_EQ(x(0, 0), 1) << "Vectors x and y are of unequal length";
+    ASSERT_EQ(x(0, 1), 2) << "Vectors x and y are of unequal length";
+    ASSERT_EQ(x(1, 0), 4) << "Vectors x and y are of unequal length";
 }
 
-TEST(matrix_operations, eq_matrix_00){
+TEST(matrix_operations, eq_matrix_00) {
     S21Matrix x(3, 3);
     S21Matrix y(3, 2);
     ASSERT_EQ(x.EqMatrix(y), 0);
     ASSERT_NE(x.EqMatrix(y), 1);
 }
-TEST(matrix_operations, eq_matrix_01){
+TEST(matrix_operations, eq_matrix_01) {
     S21Matrix x(3, 3);
     x.FillMatrix(2);
     S21Matrix copy(x);
@@ -92,7 +93,7 @@ TEST(matrix_operations, eq_matrix_01){
     ASSERT_TRUE(copy.EqMatrix(x));
     ASSERT_TRUE(x.EqMatrix(copy));
 }
-TEST(matrix_operations, eq_matrix_02){
+TEST(matrix_operations, eq_matrix_02) {
     S21Matrix x(3, 3);
     x.FillMatrix(2);
     S21Matrix y(3, 3);
@@ -101,7 +102,7 @@ TEST(matrix_operations, eq_matrix_02){
     ASSERT_FALSE(x.EqMatrix(y));
 }
 
-TEST(matrix_operations, eq_matrix_03){
+TEST(matrix_operations, eq_matrix_03) {
     S21Matrix x(3, 3);
     x.FillMatrix(2);
     S21Matrix y(x);
@@ -109,7 +110,7 @@ TEST(matrix_operations, eq_matrix_03){
     ASSERT_TRUE(x == y);
 }
 
-TEST(matrix_operations, sum_matrix_00){
+TEST(matrix_operations, sum_matrix_00) {
     S21Matrix x(2, 2);
     x.FillMatrix(0);
     S21Matrix y(x);
@@ -120,7 +121,7 @@ TEST(matrix_operations, sum_matrix_00){
     ASSERT_EQ(x(1, 0), 4);
 }
 
-TEST(matrix_operations, sum_matrix_01){
+TEST(matrix_operations, sum_matrix_01) {
     S21Matrix x(2, 2);
     x.FillMatrix(0);
     S21Matrix y(x);
@@ -132,7 +133,15 @@ TEST(matrix_operations, sum_matrix_01){
     ASSERT_EQ(z(1, 0), 6);
 }
 
-TEST(matrix_operations, sub_matrix_00){
+TEST(matrix_operations, sum_matrix_02) {
+    S21Matrix x(2, 2);
+    x.FillMatrix(0);
+    S21Matrix y(3, 3);
+
+    ASSERT_THROW(x += y, std::logic_error);
+}
+
+TEST(matrix_operations, sub_matrix_00) {
     S21Matrix x(2, 2);
     x.FillMatrix(0);
     S21Matrix y(x);
@@ -143,7 +152,7 @@ TEST(matrix_operations, sub_matrix_00){
     ASSERT_EQ(x(1, 1), 0);
 }
 
-TEST(matrix_operations, sub_matrix_01){
+TEST(matrix_operations, sub_matrix_01) {
     S21Matrix x(2, 2);
     x.FillMatrix(5);
     S21Matrix y(2, 2);
@@ -159,7 +168,25 @@ TEST(matrix_operations, sub_matrix_01){
     ASSERT_EQ(z(0, 1), 6);
 }
 
-TEST(matrix_operations, mul_number_00){
+TEST(matrix_operations, sub_matrix_02) {
+    S21Matrix x(2, 2);
+    x.FillMatrix(5);
+    S21Matrix y(2, 2);
+    y.FillMatrix(1);
+    x -= y;
+    ASSERT_EQ(x(0, 0), 4);
+    ASSERT_EQ(y(0, 1), 2);
+}
+
+TEST(matrix_operations, sub_matrix_03) {
+    S21Matrix x(2, 2);
+    x.FillMatrix(0);
+    S21Matrix y(3, 3);
+
+    ASSERT_THROW(x -= y, std::logic_error);
+}
+
+TEST(matrix_operations, mul_number_00) {
     S21Matrix x;
     x.FillMatrix(5);
     x.MulNumber(1000);
@@ -168,53 +195,72 @@ TEST(matrix_operations, mul_number_00){
     x *= -1;
     ASSERT_EQ(x(0, 0), -5000);
     ASSERT_EQ(x(2, 1), -12000);
+    x = x * -0.01;
+    ASSERT_EQ(x(0, 0), 50);
+    ASSERT_EQ(x(2, 1), 120);
 }
 
-TEST(matrix_operations, mul_matrix_00){
+TEST(matrix_operations, mul_matrix_00) {
     S21Matrix x(2, 3);
     x.FillMatrix(2);
     S21Matrix y(3, 2);
     y.FillMatrix(3);
     x.MulMatrix(y);
-    S21Matrix check(2,2);
+    S21Matrix check(2, 2);
     check(0, 0) = 49;
     check(0, 1) = 58;
     check(1, 0) = 94;
-    check(1, 1) = 112;    
+    check(1, 1) = 112;
 
     ASSERT_EQ(x.EqMatrix(check), 1);
 }
 
-TEST(matrix_operations, mul_matrix_01){
+TEST(matrix_operations, mul_matrix_01) {
     S21Matrix x(2, 3);
     x.FillMatrix(2);
     S21Matrix y(3, 2);
     y.FillMatrix(3);
-    S21Matrix res = x*y;
-     
-    EXPECT_EQ(res(0,0), 49);
-    EXPECT_EQ(res(0,1), 58);
-    EXPECT_EQ(res(1,0), 94);
-    EXPECT_EQ(res(1,1), 112);
+    S21Matrix res = x * y;
 
+    EXPECT_EQ(res(0, 0), 49);
+    EXPECT_EQ(res(0, 1), 58);
+    EXPECT_EQ(res(1, 0), 94);
+    EXPECT_EQ(res(1, 1), 112);
 }
 
-TEST(matrix_operations, transpose_00){
+TEST(matrix_operations, mul_matrix_02) {
+    S21Matrix x(2, 3);
+    x.FillMatrix(2);
+    S21Matrix y(3, 2);
+    y.FillMatrix(3);
+    x *= y;
+    EXPECT_EQ(x(0, 0), 49);
+    EXPECT_EQ(x(0, 1), 58);
+    EXPECT_EQ(x(1, 0), 94);
+    EXPECT_EQ(x(1, 1), 112);
+}
+
+TEST(matrix_operations, mul_matrix_03) {
+    S21Matrix x(2, 3);
+    S21Matrix y;
+    ASSERT_THROW(x *= y, std::logic_error);
+}
+
+TEST(matrix_operations, transpose_00) {
     S21Matrix x(3, 2);
     x.FillMatrix(2);
     S21Matrix res = x.Transpose();
-    S21Matrix check(2,3);
+    S21Matrix check(2, 3);
     check(0, 0) = 2;
     check(0, 1) = 4;
     check(0, 2) = 6;
     check(1, 0) = 3;
     check(1, 1) = 5;
-    check(1, 2) = 7;  
+    check(1, 2) = 7;
     ASSERT_EQ(res.EqMatrix(check), 1);
 }
 
-
-TEST(matrix_operations, determinant_00){
+TEST(matrix_operations, determinant_00) {
     S21Matrix x(3, 3);
     x.FillMatrix(2);
     S21Matrix y = x.Transpose();
@@ -222,7 +268,7 @@ TEST(matrix_operations, determinant_00){
     ASSERT_EQ(y.Determinant(), 0);
 }
 
-TEST(matrix_operations, determinant_01){
+TEST(matrix_operations, determinant_01) {
     S21Matrix x(2, 2);
     x(0, 0) = 7;
     x(0, 1) = 5;
@@ -231,7 +277,7 @@ TEST(matrix_operations, determinant_01){
     ASSERT_EQ(x.Determinant(), 48);
 }
 
-TEST(matrix_operations, determinant_02){
+TEST(matrix_operations, determinant_02) {
     S21Matrix x(4, 4);
     x.FillMatrix(1);
     S21Matrix y = x.Transpose();
@@ -240,7 +286,12 @@ TEST(matrix_operations, determinant_02){
     ASSERT_EQ(y.Determinant(), -576);
 }
 
-TEST(matrix_operations, complements_00){
+TEST(matrix_operations, determinant_03) {
+    S21Matrix x(3, 4);
+    ASSERT_THROW(x.Determinant(), std::length_error);
+}
+
+TEST(matrix_operations, complements_00) {
     S21Matrix x(2, 2);
     x(0, 0) = -666;
     x(0, 1) = -73;
@@ -254,7 +305,7 @@ TEST(matrix_operations, complements_00){
     ASSERT_EQ(y(1, 1), -666);
 }
 
-TEST(matrix_operations, complements_01){
+TEST(matrix_operations, complements_01) {
     S21Matrix x(2, 2);
     x(0, 0) = -6;
     x(0, 1) = 7;
@@ -268,7 +319,7 @@ TEST(matrix_operations, complements_01){
     ASSERT_EQ(y(1, 1), -6);
 }
 
-TEST(matrix_operations, complements_02){
+TEST(matrix_operations, complements_02) {
     S21Matrix x;
     S21Matrix y;
     x(0, 0) = 3;
@@ -295,7 +346,15 @@ TEST(matrix_operations, complements_02){
     ASSERT_EQ(res.EqMatrix(y), true);
 }
 
-TEST(matrix_operations, inverse_00){
+TEST(matrix_operations, complements_03) {
+    S21Matrix x(2, 3);
+    ASSERT_THROW(x.CalcComplements(), std::length_error);
+    S21Matrix y;
+    y.FillMatrix(2);
+    ASSERT_THROW(y.CalcComplements(), std::logic_error);
+}
+
+TEST(matrix_operations, inverse_00) {
     S21Matrix x;
 
     x(0, 0) = 2;
@@ -321,7 +380,15 @@ TEST(matrix_operations, inverse_00){
     EXPECT_EQ(res(2, 2), 24);
 }
 
-TEST(support_func, resize_00){
+TEST(matrix_operations, inverse_01) {
+    S21Matrix x(2, 3);
+    ASSERT_THROW(x.InverseMatrix(), std::length_error);
+    S21Matrix y;
+    y.FillMatrix(2);
+    ASSERT_THROW(y.InverseMatrix(), std::logic_error);
+}
+
+TEST(support_func, resize_00) {
     S21Matrix x;
     x.FillMatrix(0);
     x.SetRows(4);
@@ -330,7 +397,7 @@ TEST(support_func, resize_00){
     EXPECT_EQ(x(3, 0), 0);
 }
 
-TEST(support_func, resize_01){
+TEST(support_func, resize_01) {
     S21Matrix x;
     x.FillMatrix(0);
     x.SetColumns(4);
@@ -338,7 +405,8 @@ TEST(support_func, resize_01){
     EXPECT_EQ(x(0, 2), 2);
     EXPECT_EQ(x(1, 3), 0);
 }
-TEST(support_func, resize_02){
+
+TEST(support_func, resize_02) {
     S21Matrix x;
     x.FillMatrix(0);
     x.SetRows(2);
@@ -347,6 +415,15 @@ TEST(support_func, resize_02){
     ASSERT_EQ(x.GetColumns(), 2);
     EXPECT_EQ(x(0, 1), 1);
     EXPECT_EQ(x(1, 0), 3);
+}
+
+TEST(support_func, par_00) {
+    S21Matrix x;
+    x.FillMatrix(1);
+    x(1, 1) = 1;
+    ASSERT_EQ(x(1, 1), 1);
+    ASSERT_THROW(x(4, -1), std::out_of_range);
+
 }
 
 int main(int argc, char **argv) {
