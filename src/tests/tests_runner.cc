@@ -45,6 +45,20 @@ TEST(constructors, copy_matrix_01) {
   }
 }
 
+TEST(constructors, copy_matrix_02) {
+  S21Matrix y(3, 3);
+  y.FillMatrix(0);
+  S21Matrix x(4, 4);
+  y = x;
+  ASSERT_EQ(x.GetRows(), y.GetRows());
+  ASSERT_EQ(x.GetColumns(), y.GetColumns());
+  for (int i = 0; i < x.GetRows(); ++i) {
+    for (int j = 0; j < x.GetColumns(); j++) {
+      EXPECT_EQ(x(i, j), y(i, j));
+    }
+  }
+}
+
 TEST(constructors, move_matrix) {
   S21Matrix x(4, 2);
   x.FillMatrix(1);
@@ -416,6 +430,13 @@ TEST(support_func, resize_02) {
   ASSERT_EQ(x.GetColumns(), 2);
   EXPECT_EQ(x(0, 1), 1);
   EXPECT_EQ(x(1, 0), 3);
+}
+
+TEST(support_func, resize_03) {
+  S21Matrix x;
+  x.FillMatrix(0);
+  ASSERT_THROW(x.SetRows(0), std::length_error);
+  ASSERT_THROW(x.SetColumns(0), std::length_error);
 }
 
 TEST(support_func, par_00) {

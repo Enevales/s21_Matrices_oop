@@ -3,7 +3,6 @@
 
 #include <math.h>
 
-#include <iostream>  // delete
 #include <stdexcept>
 #define EPS 1e-7
 

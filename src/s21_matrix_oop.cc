@@ -1,6 +1,6 @@
 #include "s21_matrix_oop.h"
 
-// SUPPORTING FUNCTIONS
+// CONSTRUCTORS AND DESTRUCTOR ---------------------------
 
 // Default constructor
 S21Matrix::S21Matrix() : rows_(3), cols_(3) { CreateMatrix(rows_, cols_); }
@@ -54,14 +54,7 @@ void S21Matrix::DeleteMatrix() {
   }
 }
 
-void S21Matrix::FillMatrix(double num) {
-  for (int i = 0; i < rows_; i++) {
-    for (int j = 0; j < cols_; j++) {
-      matrix_[i][j] = num;
-      num++;
-    }
-  }
-}
+// ACCESSORS AND MUTATORS ---------------------------
 
 void S21Matrix::SetRows(const int rows) {
   if (rows <= 0)
@@ -90,14 +83,28 @@ void S21Matrix::SetColumns(const int cols) {
   *this = std::move(res);
 }
 
+int S21Matrix::GetRows() const noexcept { return rows_; }
+int S21Matrix::GetColumns() const noexcept { return cols_; }
+
+
+// SUPPORTING FUNCTIONS ---------------------------
+
+void S21Matrix::FillMatrix(double num) {
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      matrix_[i][j] = num;
+      num++;
+    }
+  }
+}
+
 int S21Matrix::is_square() const noexcept {
   if (rows_ == cols_) return 1;
   return 0;
 }
-int S21Matrix::GetRows() const noexcept { return rows_; }
-int S21Matrix::GetColumns() const noexcept { return cols_; }
 
-// MATRIX OPERATIONS
+
+// MATRIX OPERATIONS ---------------------------
 
 S21Matrix S21Matrix::SubMatrix(int row, int column) {
   S21Matrix sub(rows_ - 1, cols_ - 1);
@@ -254,7 +261,7 @@ S21Matrix S21Matrix::InverseMatrix() {
   return res;
 }
 
-// OVERLOADED OPERATORS
+// OVERLOADED OPERATORS ---------------------------
 
 S21Matrix S21Matrix::operator+(const S21Matrix &other) {
   S21Matrix res(*this);
@@ -278,10 +285,11 @@ S21Matrix S21Matrix::operator*(double num) {
 }
 bool S21Matrix::operator==(S21Matrix &other) const { return EqMatrix(other); }
 
-S21Matrix S21Matrix::operator=(S21Matrix &other) {
+S21Matrix S21Matrix::operator=(S21Matrix &other){
   if (this != &other) {
-    std::swap(rows_, other.rows_);
-    std::swap(cols_, other.cols_);
+    rows_ = other.rows_;
+    cols_ = other.cols_;
+    CreateMatrix(other.rows_, other.cols_);
     for (int i = 0; i < rows_; i++) {
       for (int j = 0; j < cols_; j++) {
         matrix_[i][j] = other.matrix_[i][j];
