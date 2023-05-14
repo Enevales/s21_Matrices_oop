@@ -3,7 +3,8 @@
 // CONSTRUCTORS AND DESTRUCTOR ---------------------------
 
 // Default constructor
-S21Matrix::S21Matrix() : rows_(3), cols_(3) { CreateMatrix(rows_, cols_); }
+S21Matrix::S21Matrix() : rows_(3), cols_(3) {CreateMatrix(rows_, cols_);}
+
 // Parametrized constructor with number of rows and columns
 S21Matrix::S21Matrix(int rows, int cols) {
   if (rows < 1 || cols < 1) {
@@ -38,6 +39,7 @@ S21Matrix::~S21Matrix() { DeleteMatrix(); }
 
 S21Matrix &S21Matrix::CreateMatrix(int rows, int cols) {
   matrix_ = new double *[rows];
+
   for (int i = 0; i < rows; i++) {
     matrix_[i] = new double[cols]();
   }
@@ -126,9 +128,9 @@ S21Matrix S21Matrix::SubMatrix(int row, int column) {
 bool S21Matrix::EqMatrix(const S21Matrix &other) const {
   bool is_equal = true;
   if ((rows_ == other.rows_) && (cols_ == other.cols_)) {
-    for (int i = 0; i < rows_; i++) {
-      for (int j = 0; j < cols_; j++) {
-        if (fabs(matrix_[i][j] - other.matrix_[i][j]) > EPS) return false;
+    for (int i = 0; i < rows_ && is_equal == true; i++) {
+      for (int j = 0; j < cols_ && is_equal == true; j++) {
+        if (fabs(matrix_[i][j] - other.matrix_[i][j]) > EPS) is_equal = false;
       }
     }
   } else {
