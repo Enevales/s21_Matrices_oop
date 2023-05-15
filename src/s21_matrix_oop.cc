@@ -3,7 +3,7 @@
 // CONSTRUCTORS AND DESTRUCTOR ---------------------------
 
 // Default constructor
-S21Matrix::S21Matrix() : rows_(3), cols_(3) {CreateMatrix(rows_, cols_);}
+S21Matrix::S21Matrix() : rows_(3), cols_(3) { CreateMatrix(rows_, cols_); }
 
 // Parametrized constructor with number of rows and columns
 S21Matrix::S21Matrix(int rows, int cols) {
@@ -39,7 +39,6 @@ S21Matrix::~S21Matrix() { DeleteMatrix(); }
 
 S21Matrix &S21Matrix::CreateMatrix(int rows, int cols) {
   matrix_ = new double *[rows];
-
   for (int i = 0; i < rows; i++) {
     matrix_[i] = new double[cols]();
   }
@@ -88,7 +87,6 @@ void S21Matrix::SetColumns(const int cols) {
 int S21Matrix::GetRows() const noexcept { return rows_; }
 int S21Matrix::GetColumns() const noexcept { return cols_; }
 
-
 // SUPPORTING FUNCTIONS ---------------------------
 
 void S21Matrix::FillMatrix(double num) {
@@ -105,25 +103,7 @@ int S21Matrix::is_square() const noexcept {
   return 0;
 }
 
-
 // MATRIX OPERATIONS ---------------------------
-
-S21Matrix S21Matrix::SubMatrix(int row, int column) {
-  S21Matrix sub(rows_ - 1, cols_ - 1);
-  int m = 0;
-  int n = 0;
-  for (int i = 0; i < rows_; i++) {
-    if (i == row) continue;
-    for (int j = 0; j < cols_; j++) {
-      if (j == column) continue;
-      sub.matrix_[m][n] = matrix_[i][j];
-      n++;
-      if (n == sub.cols_) n = 0;
-    }
-    m++;
-  }
-  return sub;
-}
 
 bool S21Matrix::EqMatrix(const S21Matrix &other) const {
   bool is_equal = true;
@@ -196,21 +176,22 @@ S21Matrix S21Matrix::Transpose() {
   return res;
 }
 
-S21Matrix S21Matrix::SubMatrix_min(
-    int column) {  // finding the minor of a matrix
+// a matrix formed from parts of a larger matrix
+S21Matrix S21Matrix::SubmatrixMin(int row, int column) {
+  S21Matrix sub(rows_ - 1, cols_ - 1);
   int m = 0;
   int n = 0;
-  S21Matrix res((this->rows_) - 1, (this->cols_) - 1);
-  for (int i = 1; i < rows_; i++) {
+  for (int i = 0; i < rows_; i++) {
+    if (i == row) continue;
     for (int j = 0; j < cols_; j++) {
       if (j == column) continue;
-      res.matrix_[m][n] = matrix_[i][j];
+      sub.matrix_[m][n] = matrix_[i][j];
       n++;
-      if (n == res.cols_) n = 0;
+      if (n == sub.cols_) n = 0;
     }
     m++;
   }
-  return res;
+  return sub;
 }
 
 double S21Matrix::Determinant() {
@@ -226,7 +207,7 @@ double S21Matrix::Determinant() {
     det = matrix_[0][0] * matrix_[1][1] - matrix_[0][1] * matrix_[1][0];
   } else if (order > 2) {
     for (int i = 0; i < order; i++) {
-      S21Matrix temp = SubMatrix_min(i);
+      S21Matrix temp = SubmatrixMin(0, i);
       det_temp = temp.Determinant();
       if ((i % 2) != 0) det_temp *= -1;
       det += matrix_[0][i] * det_temp;
@@ -243,7 +224,7 @@ S21Matrix S21Matrix::CalcComplements() {
   S21Matrix res(*this);
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
-      S21Matrix temp = SubMatrix(i, j);
+      S21Matrix temp = SubmatrixMin(i, j);
       res.matrix_[i][j] = temp.Determinant();
       if ((i + j + 2) % 2 != 0) res.matrix_[i][j] *= -1;
     }
@@ -257,6 +238,7 @@ S21Matrix S21Matrix::InverseMatrix() {
   double det = this->Determinant();
   if (det == 0)
     throw std::logic_error("The determinant should be greater than zero!");
+  if (rows_ == 1 && cols_ == 1) return *this;
   S21Matrix temp = this->CalcComplements();
   S21Matrix res = temp.Transpose();
   res.MulNumber(1 / det);
@@ -285,23 +267,21 @@ S21Matrix S21Matrix::operator*(double num) {
   res.MulNumber(num);
   return res;
 }
+
 bool S21Matrix::operator==(S21Matrix &other) const { return EqMatrix(other); }
 
-S21Matrix S21Matrix::operator=(S21Matrix &other){
-  if (this != &other) {
-    rows_ = other.rows_;
-    cols_ = other.cols_;
-    CreateMatrix(other.rows_, other.cols_);
-    for (int i = 0; i < rows_; i++) {
-      for (int j = 0; j < cols_; j++) {
-        matrix_[i][j] = other.matrix_[i][j];
-      }
+S21Matrix S21Matrix::operator=(S21Matrix &other) {
+  SetRows(other.rows_);
+  SetColumns(other.cols_);
+  for (int i = 0; i < rows_; i++) {
+    for (int j = 0; j < cols_; j++) {
+      matrix_[i][j] = other.matrix_[i][j];
     }
   }
   return *this;
 }
 
-// assignment operator that will accept a temporary object.
+// assignment operator that will accept a temporary rvalue object.
 
 S21Matrix &S21Matrix::operator=(S21Matrix &&other) noexcept {
   if (this != &other) {

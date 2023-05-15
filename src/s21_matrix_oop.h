@@ -30,8 +30,7 @@ class S21Matrix {
   int GetColumns() const noexcept;
   S21Matrix &CreateMatrix(int rows, int cols);
   void DeleteMatrix();
-  S21Matrix SubMatrix(int row, int column);
-  S21Matrix SubMatrix_min(int column);
+  S21Matrix SubmatrixMin(int row, int column);
   void SetElement(int row, int col, double value);
   void FillMatrix(double num);
 

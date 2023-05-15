@@ -6,7 +6,7 @@ UNAME:=$(shell uname -s)
 LIB = s21_matrix_oop.a
 
 ifeq ($(UNAME),Linux)
-	LDLIBS = -lgtest `pkg-config --cflags --libs check`
+	LDLIBS = -lgtest 
 	OPEN_CM=xdg-open
 endif
 ifeq ($(UNAME),Darwin)

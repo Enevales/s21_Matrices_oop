@@ -59,11 +59,22 @@ TEST(constructors, copy_matrix_02) {
   }
 }
 
-TEST(constructors, move_matrix) {
+TEST(constructors, move_matrix_00) {
   S21Matrix x(4, 2);
   x.FillMatrix(1);
   S21Matrix y = std::move(x);
   // S21Matrix y = ((S21Matrix&&)x);
+  ASSERT_EQ(y.GetColumns(), 2);
+  ASSERT_EQ(y.GetRows(), 4);
+  ASSERT_EQ(y(0, 0), 1);
+  ASSERT_EQ(y(1, 0), 3);
+}
+
+TEST(constructors, move_matrix_01) {
+  S21Matrix x(4, 2);
+  x.FillMatrix(1);
+  S21Matrix y(3, 3);
+  y = std::move(x);
   ASSERT_EQ(y.GetColumns(), 2);
   ASSERT_EQ(y.GetRows(), 4);
   ASSERT_EQ(y(0, 0), 1);
@@ -445,6 +456,19 @@ TEST(support_func, par_00) {
   x(1, 1) = 1;
   ASSERT_EQ(x(1, 1), 1);
   ASSERT_THROW(x(4, -1), std::out_of_range);
+}
+
+TEST(support_func, matrix_1x1) {
+  S21Matrix x(1, 1);
+  x.FillMatrix(1);
+  ASSERT_EQ(x(0, 0), 1);
+  x.MulNumber(5);
+  ASSERT_EQ(x(0, 0), 5);
+  x.InverseMatrix();
+  ASSERT_EQ(x(0, 0), 5);
+  S21Matrix y = x;
+  y = y - x;
+  ASSERT_EQ(y(0, 0), 0);
 }
 
 int main(int argc, char **argv) {
