@@ -1,6 +1,6 @@
 CC = g++
 COVFLAGS = -fprofile-arcs -ftest-coverage
-CHECKFLAGS = -Wall -Werror -Wextra -std=c++17
+CHECKFLAGS = -Wall -Werror -Wextra -pedantic -std=c++17
 PREF_TEST = ./tests/
 UNAME:=$(shell uname -s)
 LIB = s21_matrix_oop.a

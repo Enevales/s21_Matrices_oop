@@ -2,9 +2,10 @@
 #define S21_MATRIX_OOP_H
 
 #include <math.h>
-
 #include <stdexcept>
-#define EPS 1e-7
+#include <cstring>
+
+const double EPS = 1e-7;
 
 class S21Matrix {
  private:
@@ -22,15 +23,15 @@ class S21Matrix {
 
   // SUPPORTING FUNCTIONS
 
-  void SetRows(const int rows);
-  void SetColumns(const int cols);
+  void SetRows(const int &rows);
+  void SetColumns(const int &cols);
 
   int is_square() const noexcept;
   int GetRows() const noexcept;
   int GetColumns() const noexcept;
   S21Matrix &CreateMatrix(int rows, int cols);
   void DeleteMatrix();
-  S21Matrix SubmatrixMin(int row, int column);
+  S21Matrix SubmatrixMin(int row, int column) const;
   void SetElement(int row, int col, double value);
   void FillMatrix(double num);
 
@@ -39,17 +40,17 @@ class S21Matrix {
   bool EqMatrix(const S21Matrix &other) const;
   void SumMatrix(const S21Matrix &other);
   void SubMatrix(const S21Matrix &other);
-  void MulNumber(const double num) noexcept;
+  void MulNumber(const double &num) noexcept;
   void MulMatrix(const S21Matrix &other);
-  S21Matrix Transpose();
-  S21Matrix CalcComplements();
-  double Determinant();
-  S21Matrix InverseMatrix();
+  S21Matrix Transpose() const;
+  S21Matrix CalcComplements() const;
+  double Determinant() const;
+  S21Matrix InverseMatrix() const;
 
   // OVERLOADED OPERATORS
 
   S21Matrix operator=(S21Matrix &other);
-  S21Matrix &operator=(S21Matrix &&other) noexcept;
+  S21Matrix operator=(S21Matrix &&other) noexcept;
   S21Matrix operator+(const S21Matrix &other);
   S21Matrix operator-(const S21Matrix &other);
   S21Matrix operator*(const S21Matrix &other);
@@ -57,7 +58,7 @@ class S21Matrix {
   bool operator==(S21Matrix &other) const;
   void operator+=(S21Matrix &other);
   void operator-=(S21Matrix &other);
-  void operator*=(S21Matrix &other);
+  void operator*=(S21Matrix &other) ;
   void operator*=(double num);
 
   double &operator()(int i, int j) const;

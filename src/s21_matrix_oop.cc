@@ -49,6 +49,7 @@ void S21Matrix::DeleteMatrix() {
   if (matrix_) {
     for (int i = 0; i < rows_; i++) {
       delete[] matrix_[i];
+      matrix_[i] = nullptr;
     }
     delete[] matrix_;
     matrix_ = nullptr;
@@ -57,7 +58,7 @@ void S21Matrix::DeleteMatrix() {
 
 // ACCESSORS AND MUTATORS ---------------------------
 
-void S21Matrix::SetRows(const int rows) {
+void S21Matrix::SetRows(const int &rows) {
   if (rows <= 0)
     throw std::length_error("The number of rows must be greater than zero!");
   S21Matrix res(rows, cols_);
@@ -70,7 +71,7 @@ void S21Matrix::SetRows(const int rows) {
   *this = std::move(res);
 }
 
-void S21Matrix::SetColumns(const int cols) {
+void S21Matrix::SetColumns(const int &cols) {
   if (cols <= 0)
     throw std::length_error("The number of rows must be greater than zero!");
 
@@ -99,8 +100,7 @@ void S21Matrix::FillMatrix(double num) {
 }
 
 int S21Matrix::is_square() const noexcept {
-  if (rows_ == cols_) return 1;
-  return 0;
+  return (rows_ == cols_);
 }
 
 // MATRIX OPERATIONS ---------------------------
@@ -141,7 +141,7 @@ void S21Matrix::SubMatrix(const S21Matrix &other) {
   }
 }
 
-void S21Matrix::MulNumber(const double num) noexcept {
+void S21Matrix::MulNumber(const double &num) noexcept {
   for (int i = 0; i < rows_; i++) {
     for (int j = 0; j < cols_; j++) {
       matrix_[i][j] = matrix_[i][j] * num;
@@ -166,7 +166,7 @@ void S21Matrix::MulMatrix(const S21Matrix &other) {
   *this = res;
 }
 
-S21Matrix S21Matrix::Transpose() {
+S21Matrix S21Matrix::Transpose() const{
   S21Matrix res(cols_, rows_);
   for (int i = 0; i < res.rows_; i++) {
     for (int j = 0; j < res.cols_; j++) {
@@ -177,7 +177,7 @@ S21Matrix S21Matrix::Transpose() {
 }
 
 // a matrix formed from parts of a larger matrix
-S21Matrix S21Matrix::SubmatrixMin(int row, int column) {
+S21Matrix S21Matrix::SubmatrixMin(int row, int column) const{
   S21Matrix sub(rows_ - 1, cols_ - 1);
   int m = 0;
   int n = 0;
@@ -194,7 +194,7 @@ S21Matrix S21Matrix::SubmatrixMin(int row, int column) {
   return sub;
 }
 
-double S21Matrix::Determinant() {
+double S21Matrix::Determinant() const{
   if (!this->is_square())
     throw std::length_error("The matrix should be square!");
 
@@ -216,7 +216,7 @@ double S21Matrix::Determinant() {
   return det;
 }
 
-S21Matrix S21Matrix::CalcComplements() {
+S21Matrix S21Matrix::CalcComplements() const{
   if (!this->is_square())
     throw std::length_error("The matrix should be square!");
   if (this->Determinant() == 0)
@@ -232,7 +232,7 @@ S21Matrix S21Matrix::CalcComplements() {
   return res;
 }
 
-S21Matrix S21Matrix::InverseMatrix() {
+S21Matrix S21Matrix::InverseMatrix() const{
   if (!this->is_square())
     throw std::length_error("The matrix should be square!");
   double det = this->Determinant();
@@ -283,7 +283,7 @@ S21Matrix S21Matrix::operator=(S21Matrix &other) {
 
 // assignment operator that will accept a temporary rvalue object.
 
-S21Matrix &S21Matrix::operator=(S21Matrix &&other) noexcept {
+S21Matrix S21Matrix::operator=(S21Matrix &&other) noexcept {
   if (this != &other) {
     DeleteMatrix();
     rows_ = other.rows_;
